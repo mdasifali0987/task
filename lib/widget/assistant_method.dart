@@ -11,9 +11,10 @@ class AssistantMethod {
     BuildContext context,
     String phoneNumber,
   ) async {
-    const uri = "https://test-otp-api.7474224.xyz/sendotp.php";
-    final response = await http.get(Uri.parse(uri));
     try {
+      const uri = "https://test-otp-api.7474224.xyz/sendotp.php";
+      final response = await http.get(Uri.parse(uri));
+
       if (response.statusCode == 200) {
         String responseData = response.body;
         //var data = jsonDecode(responseData);
@@ -30,27 +31,31 @@ class AssistantMethod {
 
   static Future verify(
       BuildContext context, String phone, String phoneCode) async {
-    const uri = 'https://test-otp-api.7474224.xyz/verifyotp.php';
-    final response = await http.post(
-      Uri.parse(uri),
-      body:
-          jsonEncode(<String, String>{"request_id": phone, "code": phoneCode}),
-    );
+    try {
+      const uri = 'https://test-otp-api.7474224.xyz/verifyotp.php';
+      final response = await http.post(
+        Uri.parse(uri),
+        body: jsonEncode(
+            <String, String>{"request_id": phone, "code": phoneCode}),
+      );
 
-    if (response.statusCode == 200) {
-      String responseData = response.body;
-      var data = jsonDecode(responseData);
-      var status = data["status"];
-      print(">>>>>>>>>>>>>>>>>>>>$data");
-      if (status == true) {
-        await Fluttertoast.showToast(msg: "Successfully");
-         Navigator.push(
-            context, MaterialPageRoute(builder: (_) => LogInWithNameEmail()));
+      if (response.statusCode == 200) {
+        String responseData = response.body;
+        var data = jsonDecode(responseData);
+        var status = data["status"];
+        print(">>>>>>>>>>>>>>>>>>>>$data");
+        if (status == true) {
+          await Fluttertoast.showToast(msg: "Successfully");
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => LogInWithNameEmail()));
+        } else {
+          await Fluttertoast.showToast(msg: "Invalid OTP");
+        }
       } else {
-        await Fluttertoast.showToast(msg: "Invalid OTP");
+        throw Exception('>>>>>>>>>>>>>>Failed');
       }
-    } else {
-      throw Exception('>>>>>>>>>>>>>>Failed');
+    } catch (e) {
+      return "error failed no response ";
     }
   }
 
@@ -59,25 +64,29 @@ class AssistantMethod {
     String name,
     String email,
   ) async {
-    const uri = 'https://test-otp-api.7474224.xyz/profilesubmit.php';
-    final response = await http.post(
-      Uri.parse(uri),
-      headers: <String, String>{
-        'Headers': '',
-        'Token': 'jwt1235',
-      },
-    );
+    try {
+      const uri = 'https://test-otp-api.7474224.xyz/profilesubmit.php';
+      final response = await http.post(
+        Uri.parse(uri),
+        headers: <String, String>{
+          'Headers': '',
+          'Token': 'jwt1235',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      String responseData = response.body;
-      var data = jsonDecode(responseData);
-      print(">>>>>>>>>>>>>>>>>>>>$data");
-      await Fluttertoast.showToast(msg: "Successfully Logged In");
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => HomeScreen(name, email)),
-          (Route<dynamic> route) => false);
-    } else {
-      throw Exception('>>>>>>>>>>>>>>Failed');
+      if (response.statusCode == 200) {
+        String responseData = response.body;
+        var data = jsonDecode(responseData);
+        print(">>>>>>>>>>>>>>>>>>>>$data");
+        await Fluttertoast.showToast(msg: "Successfully Logged In");
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen(name, email)),
+            (Route<dynamic> route) => false);
+      } else {
+        throw Exception('>>>>>>>>>>>>>>Failed');
+      }
+    } catch (e) {
+      return "error failed no response ";
     }
   }
 }
